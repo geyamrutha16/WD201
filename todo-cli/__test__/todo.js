@@ -1,48 +1,92 @@
-const todoList = require("../todo.js");
+const {
+    todo,
+    add,
+    markAsComplete,
+    overdue,
+    dueToday,
+    dueLater,
+    toDisplayableList,
+} = require("../todo");
 
-const { all, add, markAsComplete, overdue, dueToday, dueLater, toDisplayableList } = todoList();
+const today = new Date();
+const oneDayMs = 86400000;
+const yesterday = new Date(today.getTime() - oneDayMs);
+const tomorrow = new Date(today.getTime() + oneDayMs);
 
 describe("Todo List Test Suite", () => {
     beforeAll(() => {
-        // Add some initial todos for testing
-        add({ title: "Submit assignment", dueDate: "2023-12-25", completed: false });
-        add({ title: "Pay rent", dueDate: "2023-12-31", completed: false });
-        add({ title: "Service Vehicle", dueDate: "2023-12-31", completed: false });
-        add({ title: "File taxes", dueDate: "2024-01-01", completed: false });
-        add({ title: "Pay electric bill", dueDate: "2024-01-01", completed: false });
+        // Seed some test data
+        add({
+            title: "Pay rent",
+            dueDate: yesterday.toISOString().split("T")[0],
+            completed: false,
+        });
+        add({
+            title: "Service vehicle",
+            dueDate: today.toISOString().split("T")[0],
+            completed: false,
+        });
+        add({
+            title: "File taxes",
+            dueDate: tomorrow.toISOString().split("T")[0],
+            completed: false,
+        });
     });
 
     test("Should add a new todo", () => {
-        const todoCount = all.length;
-        add({ title: "New Todo", dueDate: "2023-12-31", completed: false });
-        expect(all.length).toBe(todoCount + 1);
+        const todoCount = todo.length;
+        add({
+            title: "New todo item",
+            dueDate: today.toISOString().split("T")[0],
+            completed: false,
+        });
+        expect(todo.length).toBe(todoCount + 1);
     });
 
-    test("Should mark a todo as completed", () => {
-        expect(all[0].completed).toBe(false);
+    test("Should mark a todo as complete", () => {
+        expect(todo[0].completed).toBe(false);
         markAsComplete(0);
-        expect(all[0].completed).toBe(true);
+        expect(todo[0].completed).toBe(true);
     });
 
     test("Should retrieve overdue items", () => {
-        const today = new Date().toISOString().split("T")[0];
         const overdueItems = overdue();
         expect(overdueItems.length).toBe(1);
-        expect(overdueItems[0].title).toBe("Submit assignment");
+        expect(overdueItems[0].title).toBe("Pay rent");
     });
 
     test("Should retrieve due today items", () => {
-        const today = new Date().toISOString().split("T")[0];
         const dueTodayItems = dueToday();
-        expect(dueTodayItems.length).toBe(2);
-        expect(dueTodayItems[0].title).toBe("Pay rent");
-        expect(dueTodayItems[1].title).toBe("Service Vehicle");
+        expect(dueTodayItems.length).toBe(2); // Service vehicle + New todo item
+        expect(dueTodayItems[0].title).toBe("Service vehicle");
     });
 
     test("Should retrieve due later items", () => {
         const dueLaterItems = dueLater();
-        expect(dueLaterItems.length).toBe(2);
+        expect(dueLaterItems.length).toBe(1);
         expect(dueLaterItems[0].title).toBe("File taxes");
-        expect(dueLaterItems[1].title).toBe("Pay electric bill");
+    });
+});
+
+describe("Displayable List Test Suite", () => {
+    test("Should format overdue items correctly", () => {
+        const overdueItems = overdue();
+        const displayableList = toDisplayableList(overdueItems);
+        expect(displayableList).toContain("[x] Pay rent");
+        expect(displayableList).toContain(yesterday.toISOString().split("T")[0]);
+    });
+
+    test("Should format due today items correctly", () => {
+        const dueTodayItems = dueToday();
+        const displayableList = toDisplayableList(dueTodayItems);
+        expect(displayableList).toContain("[ ] Service vehicle");
+        expect(displayableList).not.toContain(today.toISOString().split("T")[0]); // Should omit date for today
+    });
+
+    test("Should format due later items correctly", () => {
+        const dueLaterItems = dueLater();
+        const displayableList = toDisplayableList(dueLaterItems);
+        expect(displayableList).toContain("[ ] File taxes");
+        expect(displayableList).toContain(tomorrow.toISOString().split("T")[0]);
     });
 });

@@ -37,13 +37,14 @@ app.put('/todos/:id/markAsComplete', async (req, res) => {
     try {
         const todo = await db.Todo.findByPk(req.params.id);
         if (!todo) {
-            return res.status(404).json({ error: 'Todo not found' });
+            return res.status(404).json(false);
         }
-        const updatedTodo = await todo.update({ completed: true });
-        res.json(updatedTodo);
+
+        await todo.update({ completed: true });
+        res.json(true);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json(false);
     }
 });
 
@@ -56,7 +57,7 @@ app.delete('/todos/:id', async (req, res) => {
         res.json(deletedCount > 0);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json(false);
     }
 });
 

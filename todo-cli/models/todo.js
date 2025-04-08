@@ -30,8 +30,7 @@ module.exports = (sequelize, DataTypes) => {
             const today = new Date().toISOString().split('T')[0];
             return await Todo.findAll({
                 where: {
-                    dueDate: { [Op.lt]: today },
-                    completed: false
+                    dueDate: { [Op.lt]: today }
                 },
                 order: [['dueDate', 'ASC']]
             });
@@ -51,8 +50,7 @@ module.exports = (sequelize, DataTypes) => {
             const today = new Date().toISOString().split('T')[0];
             return await Todo.findAll({
                 where: {
-                    dueDate: { [Op.gt]: today },
-                    completed: false
+                    dueDate: { [Op.gt]: today }
                 },
                 order: [['dueDate', 'ASC']]
             });
@@ -69,7 +67,9 @@ module.exports = (sequelize, DataTypes) => {
         displayableString() {
             const today = new Date().toISOString().split('T')[0];
             const checkbox = this.completed ? "[x]" : "[ ]";
-            const displayDate = this.dueDate === today ? '' : ` ${this.dueDate}`;
+            const displayDate = (this.dueDate === today || (this.completed && this.dueDate >= today))
+                ? ''
+                : ` ${this.dueDate}`;
             return `${this.id}. ${checkbox} ${this.title.trim()}${displayDate}`;
         }
     }

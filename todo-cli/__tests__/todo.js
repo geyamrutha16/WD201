@@ -13,34 +13,44 @@ const oneDayMs = 86400000;
 const yesterday = new Date(today.getTime() - oneDayMs);
 const tomorrow = new Date(today.getTime() + oneDayMs);
 
+const formatDate = (date) => date.toISOString().split("T")[0];
+
 describe("Todo List Test Suite", () => {
-    beforeAll(() => {
-        // Seed some test data
+    beforeEach(() => {
+        // Clear todos before each test
+        todo.length = 0;
+
+        // Add test data
         add({
             title: "Pay rent",
-            dueDate: yesterday.toISOString().split("T")[0],
+            dueDate: formatDate(yesterday),
             completed: false,
         });
         add({
             title: "Service vehicle",
-            dueDate: today.toISOString().split("T")[0],
+            dueDate: formatDate(today),
             completed: false,
         });
         add({
             title: "File taxes",
-            dueDate: tomorrow.toISOString().split("T")[0],
+            dueDate: formatDate(tomorrow),
             completed: false,
         });
     });
 
     test("Should add a new todo", () => {
-        const todoCount = todo.length;
+        const initialCount = todo.length;
         add({
             title: "New todo item",
-            dueDate: today.toISOString().split("T")[0],
-            completed: false,
+            dueDate: formatDate(today),
         });
-        expect(todo.length).toBe(todoCount + 1);
+        expect(todo.length).toBe(initialCount + 1);
+        expect(todo[todo.length - 1].title).toBe("New todo item");
+        expect(todo[todo.length - 1].completed).toBe(false);
+    });
+
+    test("Should throw error when adding invalid todo", () => {
+        expect(() => add({})).toThrow("Todo item must have title and dueDate");
     });
 
     test("Should mark a todo as complete", () => {
@@ -49,44 +59,49 @@ describe("Todo List Test Suite", () => {
         expect(todo[0].completed).toBe(true);
     });
 
+    test("Should throw error when marking invalid index as complete", () => {
+        expect(() => markAsComplete(-1)).toThrow("Invalid index");
+        expect(() => markAsComplete(999)).toThrow("Invalid index");
+    });
+
     test("Should retrieve overdue items", () => {
         const overdueItems = overdue();
-        expect(overdueItems.length).toBe(1);
+        expect(overdueItems).toHaveLength(1);
         expect(overdueItems[0].title).toBe("Pay rent");
     });
 
     test("Should retrieve due today items", () => {
         const dueTodayItems = dueToday();
-        expect(dueTodayItems.length).toBe(2); // Service vehicle + New todo item
+        expect(dueTodayItems).toHaveLength(1);
         expect(dueTodayItems[0].title).toBe("Service vehicle");
     });
 
     test("Should retrieve due later items", () => {
         const dueLaterItems = dueLater();
-        expect(dueLaterItems.length).toBe(1);
+        expect(dueLaterItems).toHaveLength(1);
         expect(dueLaterItems[0].title).toBe("File taxes");
     });
 });
 
 describe("Displayable List Test Suite", () => {
     test("Should format overdue items correctly", () => {
-        const overdueItems = overdue();
-        const displayableList = toDisplayableList(overdueItems);
-        expect(displayableList).toContain("[x] Pay rent");
-        expect(displayableList).toContain(yesterday.toISOString().split("T")[0]);
+        const displayableList = toDisplayableList(overdue());
+        expect(displayableList).toBe(`[ ] Pay rent ${formatDate(yesterday)}`);
     });
 
     test("Should format due today items correctly", () => {
-        const dueTodayItems = dueToday();
-        const displayableList = toDisplayableList(dueTodayItems);
-        expect(displayableList).toContain("[ ] Service vehicle");
-        expect(displayableList).not.toContain(today.toISOString().split("T")[0]); // Should omit date for today
+        const displayableList = toDisplayableList(dueToday());
+        expect(displayableList).toBe("[ ] Service vehicle");
     });
 
     test("Should format due later items correctly", () => {
-        const dueLaterItems = dueLater();
-        const displayableList = toDisplayableList(dueLaterItems);
-        expect(displayableList).toContain("[ ] File taxes");
-        expect(displayableList).toContain(tomorrow.toISOString().split("T")[0]);
+        const displayableList = toDisplayableList(dueLater());
+        expect(displayableList).toBe(`[ ] File taxes ${formatDate(tomorrow)}`);
+    });
+
+    test("Should format completed items with [x]", () => {
+        markAsComplete(0);
+        const displayableList = toDisplayableList([todo[0]]);
+        expect(displayableList).toContain("[x]");
     });
 });

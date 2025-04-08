@@ -1,92 +1,88 @@
-const {
-    todo,
-    add,
-    markAsComplete,
-    overdue,
-    dueToday,
-    dueLater,
-    toDisplayableList,
-} = require("../todo");
+const request = require('supertest');
+const app = require('../app');
+const db = require('../models');
 
-const today = new Date();
-const oneDayMs = 86400000;
-const yesterday = new Date(today.getTime() - oneDayMs);
-const tomorrow = new Date(today.getTime() + oneDayMs);
+describe('Todo API', () => {
+    beforeAll(async () => {
+        await db.sequelize.sync({ force: true });
+    });
 
-describe("Todo List Test Suite", () => {
-    beforeAll(() => {
-        // Seed some test data
-        add({
-            title: "Pay rent",
-            dueDate: yesterday.toISOString().split("T")[0],
-            completed: false,
-        });
-        add({
-            title: "Service vehicle",
-            dueDate: today.toISOString().split("T")[0],
-            completed: false,
-        });
-        add({
-            title: "File taxes",
-            dueDate: tomorrow.toISOString().split("T")[0],
-            completed: false,
+    afterAll(async () => {
+        await db.sequelize.close();
+    });
+
+    describe('POST /todos', () => {
+        it('creates a todo and responds with json', async () => {
+            const response = await request(app)
+                .post('/todos')
+                .send({
+                    title: 'Test Todo',
+                    dueDate: '2023-12-31'
+                })
+                .expect(200);
+
+            expect(response.body.title).toBe('Test Todo');
+            expect(response.body.dueDate).toBe('2023-12-31');
+            expect(response.body.completed).toBe(false);
         });
     });
 
-    test("Should add a new todo", () => {
-        const todoCount = todo.length;
-        add({
-            title: "New todo item",
-            dueDate: today.toISOString().split("T")[0],
-            completed: false,
+    describe('PUT /todos/:id/markAsComplete', () => {
+        it('marks a todo as complete', async () => {
+            const todo = await db.Todo.create({
+                title: 'Test Todo',
+                dueDate: '2023-12-31',
+                completed: false
+            });
+
+            const response = await request(app)
+                .put(`/todos/${todo.id}/markAsComplete`)
+                .expect(200);
+
+            expect(response.body.completed).toBe(true);
         });
-        expect(todo.length).toBe(todoCount + 1);
     });
 
-    test("Should mark a todo as complete", () => {
-        expect(todo[0].completed).toBe(false);
-        markAsComplete(0);
-        expect(todo[0].completed).toBe(true);
+    describe('GET /todos', () => {
+        it('fetches all todos', async () => {
+            await db.Todo.bulkCreate([
+                { title: 'Todo 1', dueDate: '2023-01-01', completed: false },
+                { title: 'Todo 2', dueDate: '2023-01-02', completed: true }
+            ]);
+
+            const response = await request(app)
+                .get('/todos')
+                .expect(200);
+
+            expect(response.body.length).toBe(2);
+            expect(response.body[0].title).toBe('Todo 1');
+            expect(response.body[1].title).toBe('Todo 2');
+        });
     });
 
-    test("Should retrieve overdue items", () => {
-        const overdueItems = overdue();
-        expect(overdueItems.length).toBe(1);
-        expect(overdueItems[0].title).toBe("Pay rent");
-    });
+    describe('DELETE /todos/:id', () => {
+        it('deletes a todo and returns boolean response', async () => {
+            const todo = await db.Todo.create({
+                title: 'Test Todo',
+                dueDate: '2023-12-31',
+                completed: false
+            });
 
-    test("Should retrieve due today items", () => {
-        const dueTodayItems = dueToday();
-        expect(dueTodayItems.length).toBe(2); // Service vehicle + New todo item
-        expect(dueTodayItems[0].title).toBe("Service vehicle");
-    });
+            // Test successful deletion
+            const deleteResponse = await request(app)
+                .delete(`/todos/${todo.id}`)
+                .expect(200);
+            expect(deleteResponse.body).toBe(true);
 
-    test("Should retrieve due later items", () => {
-        const dueLaterItems = dueLater();
-        expect(dueLaterItems.length).toBe(1);
-        expect(dueLaterItems[0].title).toBe("File taxes");
-    });
-});
+            // Verify todo was deleted
+            const getResponse = await request(app).get('/todos');
+            expect(getResponse.body.length).toBe(0);
 
-describe("Displayable List Test Suite", () => {
-    test("Should format overdue items correctly", () => {
-        const overdueItems = overdue();
-        const displayableList = toDisplayableList(overdueItems);
-        expect(displayableList).toContain("[x] Pay rent");
-        expect(displayableList).toContain(yesterday.toISOString().split("T")[0]);
-    });
-
-    test("Should format due today items correctly", () => {
-        const dueTodayItems = dueToday();
-        const displayableList = toDisplayableList(dueTodayItems);
-        expect(displayableList).toContain("[ ] Service vehicle");
-        expect(displayableList).not.toContain(today.toISOString().split("T")[0]); // Should omit date for today
-    });
-
-    test("Should format due later items correctly", () => {
-        const dueLaterItems = dueLater();
-        const displayableList = toDisplayableList(dueLaterItems);
-        expect(displayableList).toContain("[ ] File taxes");
-        expect(displayableList).toContain(tomorrow.toISOString().split("T")[0]);
+            // Test deletion of non-existent todo
+            const nonExistentResponse = await request(app)
+                .delete('/todos/999')
+                .expect(200);
+            expect(nonExistentResponse.body).toBe(false);
+        });
     });
 });

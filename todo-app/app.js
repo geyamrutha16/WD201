@@ -4,11 +4,26 @@ const app = express();
 
 app.use(express.json());
 
+// POST /todos - Create a new todo
+app.post('/todos', async (req, res) => {
+    try {
+        const todo = await db.Todo.create({
+            title: req.body.title,
+            dueDate: req.body.dueDate,
+            completed: false
+        });
+        res.json(todo);
+    } catch (error) {
+        console.error(error);
+        res.status(422).json({ error: 'Unable to create todo' });
+    }
+});
+
 // GET /todos - Get all todos
 app.get('/todos', async (req, res) => {
     try {
         const todos = await db.Todo.findAll({
-            order: [['id', 'ASC']] // Order by ID ascending
+            order: [['id', 'ASC']]
         });
         res.json(todos);
     } catch (error) {
@@ -17,19 +32,27 @@ app.get('/todos', async (req, res) => {
     }
 });
 
-// DELETE /todos/:id - Delete a todo by ID
+// PUT /todos/:id/markAsComplete - Mark todo as complete
+app.put('/todos/:id/markAsComplete', async (req, res) => {
+    try {
+        const todo = await db.Todo.findByPk(req.params.id);
+        if (!todo) {
+            return res.status(404).json({ error: 'Todo not found' });
+        }
+        const updatedTodo = await todo.update({ completed: true });
+        res.json(updatedTodo);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// DELETE /todos/:id - Delete a todo
 app.delete('/todos/:id', async (req, res) => {
     try {
-        const id = parseInt(req.params.id);
-        if (isNaN(id)) {
-            return res.status(400).json({ error: 'Invalid ID' });
-        }
-
         const deletedCount = await db.Todo.destroy({
-            where: { id }
+            where: { id: req.params.id }
         });
-
-        // Return true if a record was deleted, false otherwise
         res.json(deletedCount > 0);
     } catch (error) {
         console.error(error);

@@ -1,12 +1,11 @@
 {
-  "name": "todo-cli",
+  "name": "todo-app",
   "version": "1.0.0",
   "description": "Todo CLI application",
   "main": "index.js",
   "scripts": {
     "start:prod":"node index.js",
     "test": "jest",
-  "prepare": "if [ \"$CI\" != \"true\" ]; then husky install; fi",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
     "start": "node listTodos.js"

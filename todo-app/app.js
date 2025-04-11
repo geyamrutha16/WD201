@@ -1,62 +1,46 @@
-const express = require('express');
-const db = require('./models');
+const express = require("express");
 const app = express();
+const { Todo } = require("./models");
 
 app.use(express.json());
 
-// POST /todos - Create new todo
-app.post('/todos', async (req, res) => {
+app.get("/", (req, res) => {
+    res.send("Welcome to the Todo App!");
+});
+
+app.get("/todos", async (req, res) => {
+    const todos = await Todo.getTodos();
+    res.json(todos);
+});
+
+app.post("/todos", async (req, res) => {
+    const { title, dueDate } = req.body;
     try {
-        const todo = await db.Todo.create({
-            title: req.body.title,
-            dueDate: req.body.dueDate,
-            completed: false
-        });
+        const todo = await Todo.addTodo({ title, dueDate });
         res.status(201).json(todo);
     } catch (error) {
-        console.error(error);
-        res.status(422).json({ error: 'Unable to create todo' });
+        res.status(500).json({ error: "Something went wrong" });
     }
 });
 
-// GET /todos - Get all todos
-app.get('/todos', async (req, res) => {
+app.put("/todos/:id/markAsCompleted", async (req, res) => {
     try {
-        const todos = await db.Todo.findAll({
-            order: [['id', 'ASC']]
-        });
-        res.json(todos);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// PUT /todos/:id/markAsComplete - Mark todo as complete
-app.put('/todos/:id/markAsComplete', async (req, res) => {
-    try {
-        const todo = await db.Todo.findByPk(req.params.id);
-        if (!todo) {
-            return res.status(404).json(false);
+        const todo = await Todo.markAsCompleted(req.params.id);
+        if (todo) {
+            res.json(todo);
+        } else {
+            res.status(404).send("Todo not found");
         }
-
-        await todo.update({ completed: true });
-        res.json(true);
     } catch (error) {
-        console.error(error);
-        res.status(500).json(false);
+        res.status(500).send(error.message);
     }
 });
 
-// DELETE /todos/:id - Delete todo
-app.delete('/todos/:id', async (req, res) => {
+app.delete("/todos/:id", async (req, res) => {
     try {
-        const deletedCount = await db.Todo.destroy({
-            where: { id: req.params.id }
-        });
-        res.json(deletedCount > 0);
+        const result = await Todo.remove(req.params.id);
+        res.json(result);
     } catch (error) {
-        console.error(error);
         res.status(500).json(false);
     }
 });

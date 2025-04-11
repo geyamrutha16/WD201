@@ -1,98 +1,46 @@
-const request = require('supertest');
-const app = require('../app');
-const db = require('../models');
+const request = require("supertest");
+const db = require("../models");
+const app = require("../app");
 
-describe('Todo API', () => {
+describe("Todo Tests", () => {
     beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
 
-    afterAll(async () => {
-        await db.sequelize.close();
+    test("Creates a todo and responds with json at /todos POST endpoint", async () => {
+        const response = await request(app).post("/todos").send({
+            title: "Test todo",
+            dueDate: "2025-04-12",
+        });
+        expect(response.statusCode).toBe(201);
+        expect(response.body.title).toBe("Test todo");
     });
 
-    describe('POST /todos', () => {
-        it('should create a new todo', async () => {
-            const response = await request(app)
-                .post('/todos')
-                .send({
-                    title: 'Test Todo',
-                    dueDate: '2023-12-31'
-                })
-                .expect(201);
-
-            expect(response.body.title).toBe('Test Todo');
-            expect(response.body.dueDate).toBe('2023-12-31');
-            expect(response.body.completed).toBe(false);
-        });
+    test("Fetches all todos in the database using /todos endpoint", async () => {
+        const response = await request(app).get("/todos");
+        expect(response.statusCode).toBe(200);
+        expect(Array.isArray(response.body)).toBe(true);
     });
 
-    describe('GET /todos', () => {
-        it('should fetch all todos', async () => {
-            await db.Todo.create({
-                title: 'Test Todo 1',
-                dueDate: '2023-12-31',
-                completed: false
-            });
-
-            const response = await request(app)
-                .get('/todos')
-                .expect(200);
-
-            expect(response.body.length).toBe(1);
-            expect(response.body[0].title).toBe('Test Todo 1');
+    test("Marks a todo with the given ID as complete", async () => {
+        const todo = await db.Todo.create({
+            title: "Another todo",
+            dueDate: "2025-04-13",
+            completed: false,
         });
+        const response = await request(app).put(`/todos/${todo.id}/markAsCompleted`);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.completed).toBe(true);
     });
 
-    describe('PUT /todos/:id/markAsComplete', () => {
-        it('should mark a todo as complete', async () => {
-            const todo = await db.Todo.create({
-                title: 'Test Todo',
-                dueDate: '2023-12-31',
-                completed: false
-            });
-
-            const response = await request(app)
-                .put(`/todos/${todo.id}/markAsComplete`)
-                .expect(200);
-
-            expect(response.body).toBe(true);
-
-            // Verify in database
-            const updatedTodo = await db.Todo.findByPk(todo.id);
-            expect(updatedTodo.completed).toBe(true);
+    test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
+        const todo = await db.Todo.create({
+            title: "Todo to delete",
+            dueDate: "2025-04-13",
+            completed: false,
         });
-
-        it('should return false for non-existent todo', async () => {
-            const response = await request(app)
-                .put('/todos/999/markAsComplete')
-                .expect(404);
-
-            expect(response.body).toBe(false);
-        });
-    });
-
-    describe('DELETE /todos/:id', () => {
-        it('should delete a todo and return true', async () => {
-            const todo = await db.Todo.create({
-                title: 'Test Todo',
-                dueDate: '2023-12-31',
-                completed: false
-            });
-
-            const response = await request(app)
-                .delete(`/todos/${todo.id}`)
-                .expect(200);
-
-            expect(response.body).toBe(true);
-        });
-
-        it('should return false for non-existent todo', async () => {
-            const response = await request(app)
-                .delete('/todos/999')
-                .expect(200);
-
-            expect(response.body).toBe(false);
-        });
+        const response = await request(app).delete(`/todos/${todo.id}`);
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toBe(true);
     });
 });

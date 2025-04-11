@@ -1,20 +1,9 @@
 {
   "development": {
-    "username": "your_username",
-    "password": "your_password",
-    "database": "todo_app_development",
+    "username": "your_pg_user",
+    "password": "your_pg_password",
+    "database": "todo_dev",
     "host": "127.0.0.1",
-    "dialect": "postgres"
-  },
-  "test": {
-    "username": "your_username",
-    "password": "your_password",
-    "database": "todo_app_test",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
-  },
-  "production": {
-    "use_env_variable": "DATABASE_URL",
     "dialect": "postgres"
   }
 }

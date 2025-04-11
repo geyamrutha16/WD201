@@ -4,6 +4,7 @@
   "description": "Todo CLI application",
   "main": "index.js",
   "scripts": {
+    "start:prod":"node index.js",
     "test": "jest",
     "prepare": "husky install",
     "migrate": "sequelize db:migrate",

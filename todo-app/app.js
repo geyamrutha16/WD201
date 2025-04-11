@@ -5,43 +5,51 @@ const { Todo } = require("./models");
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.send("Welcome to the Todo App!");
+    res.send("Todo App running");
 });
 
 app.get("/todos", async (req, res) => {
-    const todos = await Todo.getTodos();
-    res.json(todos);
+    try {
+        const todos = await Todo.findAll({ order: [["id", "ASC"]] });
+        return res.status(200).json(todos);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
 });
 
 app.post("/todos", async (req, res) => {
-    const { title, dueDate } = req.body;
     try {
-        const todo = await Todo.addTodo({ title, dueDate });
-        res.status(201).json(todo);
+        const todo = await Todo.create({
+            title: req.body.title,
+            dueDate: req.body.dueDate,
+            completed: false,
+        });
+        return res.status(201).json(todo);
     } catch (error) {
-        res.status(500).json({ error: "Something went wrong" });
+        return res.status(500).json({ error: error.message });
     }
 });
 
 app.put("/todos/:id/markAsCompleted", async (req, res) => {
     try {
-        const todo = await Todo.markAsCompleted(req.params.id);
+        const todo = await Todo.findByPk(req.params.id);
         if (todo) {
-            res.json(todo);
-        } else {
-            res.status(404).send("Todo not found");
+            todo.completed = true;
+            await todo.save();
+            return res.status(200).json(todo);
         }
+        return res.status(404).json({ error: "Todo not found" });
     } catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).json({ error: error.message });
     }
 });
 
 app.delete("/todos/:id", async (req, res) => {
     try {
-        const result = await Todo.remove(req.params.id);
-        res.json(result);
+        const deleted = await Todo.destroy({ where: { id: req.params.id } });
+        return res.json(deleted > 0);
     } catch (error) {
-        res.status(500).json(false);
+        return res.status(500).json(false);
     }
 });
 

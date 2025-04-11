@@ -1,7 +1,7 @@
 {
   "development": {
-    "username": "your_pg_user",
-    "password": "your_pg_password",
+    "username": "postgres",
+    "password": "yourpassword",
     "database": "todo_dev",
     "host": "127.0.0.1",
     "dialect": "postgres"

@@ -2,16 +2,18 @@ const request = require("supertest");
 const db = require("../models");
 const app = require("../app");
 
-describe("Todo Tests", () => {
+describe("Todo Test Suite", () => {
     beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
 
     test("Creates a todo and responds with json at /todos POST endpoint", async () => {
-        const response = await request(app).post("/todos").send({
-            title: "Test todo",
-            dueDate: "2025-04-12",
-        });
+        const response = await request(app)
+            .post("/todos")
+            .send({
+                title: "Test todo",
+                dueDate: "2025-04-15",
+            });
         expect(response.statusCode).toBe(201);
         expect(response.body.title).toBe("Test todo");
     });
@@ -24,8 +26,8 @@ describe("Todo Tests", () => {
 
     test("Marks a todo with the given ID as complete", async () => {
         const todo = await db.Todo.create({
-            title: "Another todo",
-            dueDate: "2025-04-13",
+            title: "Todo to complete",
+            dueDate: "2025-04-16",
             completed: false,
         });
         const response = await request(app).put(`/todos/${todo.id}/markAsCompleted`);
@@ -36,7 +38,7 @@ describe("Todo Tests", () => {
     test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
         const todo = await db.Todo.create({
             title: "Todo to delete",
-            dueDate: "2025-04-13",
+            dueDate: "2025-04-17",
             completed: false,
         });
         const response = await request(app).delete(`/todos/${todo.id}`);

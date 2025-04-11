@@ -12,7 +12,7 @@ app.post('/todos', async (req, res) => {
             dueDate: req.body.dueDate,
             completed: false
         });
-        res.json(todo);
+        res.status(201).json(todo);
     } catch (error) {
         console.error(error);
         res.status(422).json({ error: 'Unable to create todo' });
@@ -41,7 +41,7 @@ app.put('/todos/:id/markAsComplete', async (req, res) => {
         }
 
         await todo.update({ completed: true });
-        res.json(true);  // Return simple boolean true
+        res.json(true);
     } catch (error) {
         console.error(error);
         res.status(500).json(false);

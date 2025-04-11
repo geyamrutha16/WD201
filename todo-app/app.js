@@ -4,7 +4,7 @@ const app = express();
 
 app.use(express.json());
 
-// POST /todos - Create a new todo
+// POST /todos - Create new todo
 app.post('/todos', async (req, res) => {
     try {
         const todo = await db.Todo.create({
@@ -41,14 +41,14 @@ app.put('/todos/:id/markAsComplete', async (req, res) => {
         }
 
         await todo.update({ completed: true });
-        res.json(true);
+        res.json(true);  // Return simple boolean true
     } catch (error) {
         console.error(error);
         res.status(500).json(false);
     }
 });
 
-// DELETE /todos/:id - Delete a todo
+// DELETE /todos/:id - Delete todo
 app.delete('/todos/:id', async (req, res) => {
     try {
         const deletedCount = await db.Todo.destroy({

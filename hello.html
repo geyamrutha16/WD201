@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="text" onclick="change()">Hello</button>
+    <button onclick="show()">Show</button>
+    <button onclick="hide()">Hide</button>
+    <script>
+        let text = document.getElementById("text");
+        function change() {
+            text.innerHTML = "Changed....!"
+        }
+        function show() {
+            text.style.display = "block";
+        }
+        function hide() {
+            text.style.display = "none";
+        }
+    </script>
+</body>
+
+</html>

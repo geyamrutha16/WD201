@@ -34,10 +34,11 @@ router.get('/', async (req, res) => {
         );
 
         res.render('index', {
-            todos,
+            todos: todos.map(t => t.get({ plain: true })), // Convert to plain objects
             overdue,
             dueToday,
-            dueLater
+            dueLater,
+            today
         });
     } catch (error) {
         console.error(error);

@@ -1,31 +1,55 @@
-<table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Due Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% todos.forEach(todo=> { %>
-            <tr>
-                <td>
-                    <%= todo.title %>
-                </td>
-                <td>
-                    <%= todo.dueDate.toISOString().split('T')[0] %>
-                </td>
-                <td>
-                    <input type="checkbox" <%=todo.completed ? 'checked' : '' %>
-                    data-id="<%= todo.id %>"
-                        class="toggle-complete"
-                        >
-                </td>
-                <td>
-                    <button data-id="<%= todo.id %>" class="delete-btn">Delete</button>
-                </td>
-            </tr>
-            <% }) %>
-    </tbody>
-</table>
+<div class="todo-sections">
+    <section class="overdue">
+        <h5>Overdue <span id="count-overdue">
+                <%= overdue.length %>
+            </span></h5>
+        <ul>
+            <% overdue.forEach(todo=> { %>
+                <li>
+                    <input type="checkbox" <%=todo.completed ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span class="due-date">
+                        <%= todo.dueDate %>
+                    </span>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+
+    <section class="due-today">
+        <h5>Due Today <span id="count-due-today">
+                <%= dueToday.length %>
+            </span></h5>
+        <ul>
+            <% dueToday.forEach(todo=> { %>
+                <li>
+                    <input type="checkbox" <%=todo.completed ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+
+    <section class="due-later">
+        <h5>Due Later <span id="count-due-later">
+                <%= dueLater.length %>
+            </span></h5>
+        <ul>
+            <% dueLater.forEach(todo=> { %>
+                <li>
+                    <input type="checkbox" <%=todo.completed ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span class="due-date">
+                        <%= todo.dueDate %>
+                    </span>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+</div>

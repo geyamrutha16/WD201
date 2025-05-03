@@ -79,4 +79,18 @@ router.delete('/todos/:id', csrfProtection, async (req, res) => {
     }
 });
 
+router.get('/todos/:id/edit', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const todo = await Todo.findByPk(id);
+        if (!todo) {
+            return res.status(404).send('Todo not found');
+        }
+        res.render('edit', { todo }); // Make sure edit.ejs exists
+    } catch (error) {
+        res.status(500).send('Server error');
+    }
+});
+
+
 module.exports = router;

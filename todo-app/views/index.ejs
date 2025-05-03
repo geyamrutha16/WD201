@@ -151,6 +151,7 @@
     <h1>This is my Todo Application</h1>
 
     <form action="/todos" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="text" name="title" placeholder="Enter task" required>
         <input type="date" name="dueDate">
         <button type="submit">Add Task</button>

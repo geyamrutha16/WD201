@@ -14,6 +14,7 @@ const csrfProtection = csrf({ cookie: true });
 // Middleware setup
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(csrfProtection);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // View engine configuration

@@ -21,6 +21,7 @@ router.get('/', async (req, res) => {
         const completed = todos.filter(todo => todo.completed);
 
         res.render('index', {
+            todos: fetchedTodos,
             overdue,
             dueToday,
             dueLater,

@@ -8,14 +8,15 @@
             <% overdue.forEach(todo=> { %>
                 <li class="Todo-Item">
                     <input type="checkbox" id="todo-<%= todo.id %>"
-                        onchange="updateTodoStatus(<%= todo.id %>, this.checked)" <%=todo.completed ? 'checked' : '' %>>
+                        onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed ? 'checked' : ''
+                        %>>
                     <label for="todo-<%= todo.id %>">
                         <%= todo.title %>
                     </label>
                     <span class="due-date">
                         <%= todo.dueDate %>
                     </span>
-                    <button class="delete-btn" onclick="deleteTodo(<%= todo.id %>)">Delete</button>
+                    <button class="delete-btn" onclick="deleteTodo('<%= todo.id %>')">Delete</button>
                 </li>
                 <% }); %>
         </ul>
@@ -30,11 +31,12 @@
             <% dueToday.forEach(todo=> { %>
                 <li class="Todo-Item">
                     <input type="checkbox" id="todo-<%= todo.id %>"
-                        onchange="updateTodoStatus(<%= todo.id %>, this.checked)" <%=todo.completed ? 'checked' : '' %>>
+                        onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed ? 'checked' : ''
+                        %>>
                     <label for="todo-<%= todo.id %>">
                         <%= todo.title %>
                     </label>
-                    <button class="delete-btn" onclick="deleteTodo(<%= todo.id %>)">Delete</button>
+                    <button class="delete-btn" onclick="deleteTodo('<%= todo.id %>')">Delete</button>
                 </li>
                 <% }); %>
         </ul>
@@ -49,14 +51,15 @@
             <% dueLater.forEach(todo=> { %>
                 <li class="Todo-Item">
                     <input type="checkbox" id="todo-<%= todo.id %>"
-                        onchange="updateTodoStatus(<%= todo.id %>, this.checked)" <%=todo.completed ? 'checked' : '' %>>
+                        onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed ? 'checked' : ''
+                        %>>
                     <label for="todo-<%= todo.id %>">
                         <%= todo.title %>
                     </label>
                     <span class="due-date">
                         <%= todo.dueDate %>
                     </span>
-                    <button class="delete-btn" onclick="deleteTodo(<%= todo.id %>)">Delete</button>
+                    <button class="delete-btn" onclick="deleteTodo('<%= todo.id %>')">Delete</button>
                 </li>
                 <% }); %>
         </ul>
@@ -71,14 +74,14 @@
             <% completed.forEach(todo=> { %>
                 <li class="Todo-Item">
                     <input type="checkbox" id="todo-<%= todo.id %>"
-                        onchange="updateTodoStatus(<%= todo.id %>, this.checked)" checked>
+                        onchange="updateTodoStatus('<%= todo.id %>', this.checked)" checked>
                     <label for="todo-<%= todo.id %>">
                         <%= todo.title %>
                     </label>
                     <span class="due-date">
                         <%= todo.dueDate %>
                     </span>
-                    <button class="delete-btn" onclick="deleteTodo(<%= todo.id %>)">Delete</button>
+                    <button class="delete-btn" onclick="deleteTodo('<%= todo.id %>')">Delete</button>
                 </li>
                 <% }); %>
         </ul>

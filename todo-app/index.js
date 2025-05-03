@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const { sequelize } = require('./models');
-const express = require('express');
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 

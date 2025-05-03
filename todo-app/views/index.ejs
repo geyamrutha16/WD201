@@ -1,13 +1,46 @@
-<%- include('header') %>
+<!DOCTYPE html>
+<html>
 
-    <main>
-        <form action="/todos" method="POST">
-            <input type="text" name="title" placeholder="Add new todo..." required>
-            <input type="date" name="dueDate" required>
-            <button type="submit">Add</button>
-        </form>
+<head>
+    <title>Todo App</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
 
-        <%- include('todos', { todos }) %>
-    </main>
+<body>
+    <h1>This is my Todo Application</h1>
 
-    <%- include('footer') %>
+    <form action="/todos" method="POST">
+        <input type="text" name="title" placeholder="Enter task" required>
+        <input type="date" name="dueDate">
+        <button type="submit">Add</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        <% todos.forEach(todo=> { %>
+            <tr>
+                <td>
+                    <%= todo.title %>
+                </td>
+                <td>
+                    <%= todo.dueDate %>
+                </td>
+                <td>
+                    <%= todo.completed ? 'Completed' : 'Pending' %>
+                </td>
+                <td>
+                    <!-- Add action buttons here -->
+                </td>
+            </tr>
+            <% }); %>
+    </table>
+
+    <footer>Built with Node.js</footer>
+</body>
+
+</html>

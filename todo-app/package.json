@@ -9,7 +9,8 @@
     "test": "jest",
     "dev": "nodemon index.js",
     "migrate": "sequelize db:migrate",
-    "migrate:undo": "sequelize db:migrate:undo"
+    "migrate:undo": "sequelize db:migrate:undo",
+    "seed": "sequelize db:seed:all"
   },
   "keywords": [],
   "author": "",

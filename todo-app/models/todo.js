@@ -2,13 +2,7 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class Todo extends Model {
-        static associate(models) {
-            // associations can be defined here
-        }
-    }
-
-    Todo.init({
+    const Todo = sequelize.define('Todo', {
         title: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -16,18 +10,8 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
         },
-        dueDate: {
-            type: DataTypes.DATEONLY,
-            allowNull: false
-        },
-        completed: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        }
-    }, {
-        sequelize,
-        modelName: 'Todo',
-    });
-
+        dueDate: DataTypes.DATEONLY,
+        completed: DataTypes.BOOLEAN
+    }, {});
     return Todo;
 };

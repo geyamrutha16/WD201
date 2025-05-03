@@ -33,4 +33,32 @@ router.post('/todos', async (req, res) => {
     }
 });
 
+// DELETE route
+router.delete('/todos/:id', async (req, res) => {
+    try {
+        const deleted = await Todo.destroy({
+            where: { id: req.params.id }
+        });
+        if (deleted) {
+            return res.status(204).send();
+        }
+        throw new Error('Todo not found');
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// EDIT route (GET)
+router.get('/todos/:id/edit', async (req, res) => {
+    try {
+        const todo = await Todo.findByPk(req.params.id);
+        if (!todo) {
+            return res.status(404).send('Todo not found');
+        }
+        res.render('edit', { todo });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
 module.exports = router;

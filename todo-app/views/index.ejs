@@ -187,40 +187,132 @@
         </tbody>
     </table>
 
-    <%- include('todos', { overdue: overdue, dueToday: dueToday, dueLater: dueLater, completed: completed, csrfToken:
-        csrfToken }) %>
+    <!-- Overdue Section -->
+    <section class="todo-section">
+        <h5>Overdue <span id="count-overdue" class="count">
+                <%= overdue.length %>
+            </span></h5>
+        <ul>
+            <% overdue.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed
+                        ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span>(Due: <%= todo.dueDate %>)</span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
 
-        <footer>
-            <h1>Built with Node.js</h1>
-        </footer>
+    <!-- Due Today Section -->
+    <section class="todo-section">
+        <h5>Due Today <span id="count-due-today" class="count">
+                <%= dueToday.length %>
+            </span></h5>
+        <ul>
+            <% dueToday.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed
+                        ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
 
-        <script>
-            function editTodo(id) {
-                window.location.href = `/todos/${id}/edit`;
-            }
+    <!-- Due Later Section -->
+    <section class="todo-section">
+        <h5>Due Later <span id="count-due-later" class="count">
+                <%= dueLater.length %>
+            </span></h5>
+        <ul>
+            <% dueLater.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed
+                        ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span>(Due: <%= todo.dueDate %>)</span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
 
-            function deleteTodo(id) {
-                if (confirm('Are you sure you want to delete this task?')) {
-                    fetch(`/todos/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
+    <!-- Completed Section -->
+    <section class="todo-section">
+        <h5>Completed Items <span id="count-completed" class="count">
+                <%= completed.length %>
+            </span></h5>
+        <ul>
+            <% completed.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" checked>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span>(Due: <%= todo.dueDate %>)</span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+
+    <footer>
+        <h1>Built with Node.js</h1>
+    </footer>
+
+    <script>
+        function updateTodoStatus(id, completed) {
+            fetch(`/todos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'CSRF-Token': document.querySelector('input[name="_csrf"]').value
+                },
+                body: JSON.stringify({ completed })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function editTodo(id) {
+            window.location.href = `/todos/${id}/edit`;
+        }
+
+        function deleteTodo(id) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                fetch(`/todos/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Failed to delete task');
                         }
                     })
-                        .then(response => {
-                            if (response.ok) {
-                                window.location.reload();
-                            } else {
-                                alert('Failed to delete task');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Error deleting task');
-                        });
-                }
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error deleting task');
+                    });
             }
-        </script>
+        }
+    </script>
 </body>
 
 </html>

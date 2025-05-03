@@ -10,8 +10,14 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
         },
-        dueDate: DataTypes.DATEONLY,
-        completed: DataTypes.BOOLEAN
-    }, {});
+        dueDate: {
+            type: DataTypes.DATEONLY,
+            allowNull: false
+        },
+        completed: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        }
+    });
     return Todo;
 };

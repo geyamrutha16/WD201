@@ -4,7 +4,7 @@ const { Todo } = require('./models');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
-router.get('/', csrfProtection, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
         const todos = await Todo.findAll({ order: [['dueDate', 'ASC']] });

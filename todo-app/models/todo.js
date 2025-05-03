@@ -1,6 +1,3 @@
-'use strict';
-const { Model } = require('sequelize');
-
 module.exports = (sequelize, DataTypes) => {
     const Todo = sequelize.define('Todo', {
         title: {
@@ -12,11 +9,20 @@ module.exports = (sequelize, DataTypes) => {
         },
         dueDate: {
             type: DataTypes.DATEONLY,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
         },
         completed: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
+        }
+    }, {
+        instanceMethods: {
+            setCompletionStatus: function (status) {
+                return this.update({ completed: status });
+            }
         }
     });
     return Todo;

@@ -1,27 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { Todo } = require('./models');
+const { Todo } = require('../models');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
 
-// GET all todos
-/*
-router.get('/', async (req, res) => {
+router.get('/', csrfProtection, async (req, res) => {
     try {
-        const todos = await Todo.findAll({ order: [['dueDate', 'ASC']] });
-        res.render('index', { todos });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-});
-*/
-
-router.get('/', async (req, res) => {
-    try {
-        const todos = await Todo.findAll({
-            order: [['dueDate', 'ASC']]
-        });
-
         const today = new Date().toISOString().split('T')[0];
+        const todos = await Todo.findAll({ order: [['dueDate', 'ASC']] });
 
         const overdue = todos.filter(todo =>
             !todo.completed && todo.dueDate < today
@@ -32,13 +18,15 @@ router.get('/', async (req, res) => {
         const dueLater = todos.filter(todo =>
             !todo.completed && todo.dueDate > today
         );
+        const completed = todos.filter(todo => todo.completed);
 
         res.render('index', {
-            todos: todos.map(t => t.get({ plain: true })), // Convert to plain objects
             overdue,
             dueToday,
             dueLater,
-            today
+            completed,
+            today,
+            csrfToken: req.csrfToken()
         });
     } catch (error) {
         console.error(error);
@@ -46,51 +34,47 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST new todo
-router.post('/todos', async (req, res) => {
+router.post('/todos', csrfProtection, async (req, res) => {
     try {
-        if (!req.body.title) {
-            return res.status(400).send('Title is required');
+        if (!req.body.title || !req.body.dueDate) {
+            return res.status(400).json({ error: 'Title and due date are required' });
         }
 
         await Todo.create({
             title: req.body.title,
-            dueDate: req.body.dueDate || null,
+            dueDate: req.body.dueDate,
             completed: false
         });
-
         res.redirect('/');
     } catch (error) {
-        console.error('Error creating todo:', error);
+        console.error(error);
         res.status(500).send('Error creating todo');
     }
 });
 
-// DELETE route
-router.delete('/todos/:id', async (req, res) => {
+router.put('/todos/:id', csrfProtection, async (req, res) => {
+    try {
+        const todo = await Todo.findByPk(req.params.id);
+        if (!todo) return res.status(404).send('Todo not found');
+
+        await todo.setCompletionStatus(req.body.completed);
+        res.status(200).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error updating todo');
+    }
+});
+
+router.delete('/todos/:id', csrfProtection, async (req, res) => {
     try {
         const deleted = await Todo.destroy({
             where: { id: req.params.id }
         });
-        if (deleted) {
-            return res.status(204).send();
-        }
-        throw new Error('Todo not found');
+        if (deleted) return res.status(204).send();
+        res.status(404).send('Todo not found');
     } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// EDIT route (GET)
-router.get('/todos/:id/edit', async (req, res) => {
-    try {
-        const todo = await Todo.findByPk(req.params.id);
-        if (!todo) {
-            return res.status(404).send('Todo not found');
-        }
-        res.render('edit', { todo });
-    } catch (error) {
-        res.status(500).send(error.message);
+        console.error(error);
+        res.status(500).send('Error deleting todo');
     }
 });
 

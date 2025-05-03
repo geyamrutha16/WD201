@@ -186,7 +186,8 @@
         </tbody>
     </table>
 
-    <%- include('todos', { overdue: overdue, dueToday: dueToday, dueLater: dueLater }) %>
+    <%- include('todos', { overdue: overdue, dueToday: dueToday, dueLater: dueLater, completed: completed, csrfToken:
+        csrfToken }) %>
         <footer>
             <h1>Built with Node.js</h1>
         </footer>

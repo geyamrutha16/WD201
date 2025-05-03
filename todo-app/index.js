@@ -1,6 +1,14 @@
 const express = require('express');
 const path = require('path');
 const { sequelize } = require('./models');
+const express = require('express');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
+
+
+// Setup CSRF protection
+app.use(cookieParser());
+const csrfProtection = csrf({ cookie: true });
 
 const app = express();
 

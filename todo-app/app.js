@@ -3,10 +3,42 @@ const router = express.Router();
 const { Todo } = require('./models');
 
 // GET all todos
+/*
 router.get('/', async (req, res) => {
     try {
         const todos = await Todo.findAll({ order: [['dueDate', 'ASC']] });
         res.render('index', { todos });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+*/
+
+router.get('/', async (req, res) => {
+    try {
+        const todos = await Todo.findAll({
+            order: [['dueDate', 'ASC']]
+        });
+
+        const today = new Date().toISOString().split('T')[0];
+
+        const overdue = todos.filter(todo =>
+            !todo.completed && todo.dueDate < today
+        );
+        const dueToday = todos.filter(todo =>
+            !todo.completed && todo.dueDate === today
+        );
+        const dueLater = todos.filter(todo =>
+            !todo.completed && todo.dueDate > today
+        );
+
+        res.render('index', {
+            todos,
+            overdue,
+            dueToday,
+            dueLater
+        });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');

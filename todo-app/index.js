@@ -4,34 +4,47 @@ const { sequelize } = require('./models');
 
 const app = express();
 
-// Middleware
+// Middleware setup
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// View engine setup
+// View engine configuration
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Routes
-const todoRouter = require('./app');
-app.use('/', todoRouter);
+const router = require('./app');
+app.use('/', router);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
+    console.error('Application error:', err.stack);
+    res.status(500).send('Internal Server Error');
 });
 
-// Database sync and server start
-sequelize.sync()
-    .then(() => {
+// Database and server initialization
+async function startServer() {
+    try {
+        // Test database connection
+        await sequelize.authenticate();
+        console.log('Database connection established');
+
+        // Sync models
+        await sequelize.sync();
+        console.log('Database synchronized');
+
+        // Start server
         const PORT = process.env.PORT || 10000;
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
-            console.log(`Database connected: ${sequelize.config.host}`);
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
         });
-    })
-    .catch(err => {
-        console.error('Database connection failed:', err);
-        process.exit(1);
-    });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1); // Exit with failure code
+    }
+}
+
+// Start the application
+startServer();

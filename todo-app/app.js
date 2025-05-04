@@ -64,7 +64,6 @@ router.post('/todos', csrfProtection, async (req, res) => {
     }
 });
 
-/*
 router.post('/todos/:id', csrfProtection, async (req, res) => {
     try {
         const todo = await Todo.findByPk(req.params.id);
@@ -83,7 +82,6 @@ router.post('/todos/:id', csrfProtection, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-*/
 
 router.put('/todos/:id', csrfProtection, async (req, res) => {
     try {
@@ -92,10 +90,8 @@ router.put('/todos/:id', csrfProtection, async (req, res) => {
             return res.status(404).json({ error: 'Todo not found' });
         }
 
-        await todo.update({
-            completed: req.body.completed,
-            // Add other fields if needed
-        });
+        await todo.update({ completed: !todo.completed });
+
         res.redirect('/');
     } catch (error) {
         console.error(error);

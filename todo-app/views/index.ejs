@@ -176,12 +176,12 @@
                     <td>
                         <%= todo.dueDate %>
                     </td>
-                    <td>
+                    <td class="<%= todo.completed ? 'completed' : 'pending' %>">
                         <%= todo.completed ? 'Completed' : 'Pending' %>
                     </td>
                     <td>
-                        <input type="checkbox" data-toggle-complete data-id="<%= todo.id %>" <%=todo.completed
-                            ? 'checked' : '' %>>
+                        <input type="checkbox" onchange="toggleTodoStatus('<%= todo.id %>', this.checked)"
+                            <%=todo.completed ? 'checked' : '' %>>
                         <button data-delete data-id="<%= todo.id %>">Delete</button>
                     </td>
                 </tr>
@@ -273,6 +273,28 @@
 
     <script>
         // In your script section
+        async function toggleTodoStatus(id, isChecked) {
+            try {
+                const response = await fetch(`/todos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'CSRF-Token': document.querySelector('[name="_csrf"]').value
+                    },
+                    body: JSON.stringify({ completed: !isChecked }) // Toggle the status
+                });
+
+                if (response.ok) {
+                    window.location.reload(); // Refresh to show updated status
+                } else {
+                    alert('Failed to update status');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating task status');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Toggle completion
             document.querySelectorAll('[data-toggle-complete]').forEach(checkbox => {

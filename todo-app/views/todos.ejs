@@ -1,7 +1,7 @@
 <div class="todo-sections">
     <!-- Overdue Section -->
-    <section class="overdue-section">
-        <h5>Overdue <span id="count-overdue">
+    <section class="overdue-section" id="overdue">
+        <h5>Overdue <span id="overdue-count">
                 <%= overdue.length %>
             </span></h5>
         <ul>
@@ -23,8 +23,8 @@
     </section>
 
     <!-- Due Today Section -->
-    <section class="due-today-section">
-        <h5>Due Today <span id="count-due-today">
+    <section class="due-today-section" id="due-today">
+        <h5>Due Today <span id="due-today-count">
                 <%= dueToday.length %>
             </span></h5>
         <ul>
@@ -43,8 +43,8 @@
     </section>
 
     <!-- Due Later Section -->
-    <section class="due-later-section">
-        <h5>Due Later <span id="count-due-later">
+    <section class="due-later-section" id="due-later">
+        <h5>Due Later <span id="due-later-count">
                 <%= dueLater.length %>
             </span></h5>
         <ul>
@@ -66,8 +66,8 @@
     </section>
 
     <!-- Completed Section -->
-    <section class="completed-section">
-        <h5>Completed Items <span id="count-completed">
+    <section class="completed-section" id="completed">
+        <h5>Completed Items <span id="completed-count">
                 <%= completed.length %>
             </span></h5>
         <ul>

@@ -40,26 +40,31 @@ router.use((req, res, next) => {
     next();
 });
 
+// In your POST route
 router.post('/todos', csrfProtection, async (req, res) => {
     try {
-        if (!req.body.title || !req.body.dueDate) {
-            return res.status(400).json({ error: 'Title and due date are required' });
+        // Validation
+        if (!req.body.title || req.body.title.trim() === '') {
+            return res.status(400).send('Title is required');
+        }
+        if (!req.body.dueDate) {
+            return res.status(400).send('Due date is required');
         }
 
+        // Create todo
         await Todo.create({
-            title: req.body.title,
+            title: req.body.title.trim(),
             dueDate: req.body.dueDate,
             completed: false
         });
 
-        // Redirect to home page after creation
         res.redirect('/');
     } catch (error) {
-        console.error(error);
         res.status(500).send('Error creating todo');
     }
 });
 
+/*
 router.post('/todos/:id', csrfProtection, async (req, res) => {
     try {
         const todo = await Todo.findByPk(req.params.id);
@@ -78,6 +83,7 @@ router.post('/todos/:id', csrfProtection, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+*/
 
 router.put('/todos/:id', csrfProtection, async (req, res) => {
     try {
@@ -90,8 +96,7 @@ router.put('/todos/:id', csrfProtection, async (req, res) => {
             completed: req.body.completed,
             // Add other fields if needed
         });
-
-        res.json(todo);
+        res.redirect('/');
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });

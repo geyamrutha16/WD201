@@ -100,9 +100,9 @@
             color: #2c3e50;
         }
 
-        #count-overdue,
-        #count-due-today,
-        #count-due-later {
+        #overdue-count,
+        #due-today-count,
+        #due-later-count {
             display: inline-block;
             margin-left: 10px;
             background: #3498db;
@@ -153,9 +153,9 @@
 
     <form action="/todos" method="POST">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <input type="text" name="title" placeholder="Enter task" required>
-        <input type="date" name="dueDate">
-        <button type="submit">Add Task</button>
+        <input type="text" name="title" id="title" placeholder="Enter task" required>
+        <input type="date" name="dueDate" id="dueDate" required>
+        <button type="submit" id="submit-btn">Add Todo</button>
     </form>
 
     <table>
@@ -176,12 +176,13 @@
                     <td>
                         <%= todo.dueDate %>
                     </td>
-                    <td class="<%= todo.completed ? 'completed' : 'pending' %>">
+                    <td>
                         <%= todo.completed ? 'Completed' : 'Pending' %>
                     </td>
-                    <td class="actions">
-                        <button class="edit-btn" onclick="editTodo('<%= todo.id %>')">Edit</button>
-                        <button class="delete-btn" onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                    <td>
+                        <input type="checkbox" data-toggle-complete data-id="<%= todo.id %>" <%=todo.completed
+                            ? 'checked' : '' %>>
+                        <button data-delete data-id="<%= todo.id %>">Delete</button>
                     </td>
                 </tr>
                 <% }); %>
@@ -189,8 +190,8 @@
     </table>
 
     <!-- Overdue Section -->
-    <section class="todo-section">
-        <h5>Overdue <span id="count-overdue" class="count">
+    <section class="todo-section" id="overdue">
+        <h5>Overdue <span id="overdue-count" class="count">
                 <%= overdue.length %>
             </span></h5>
         <ul>
@@ -209,8 +210,8 @@
     </section>
 
     <!-- Due Today Section -->
-    <section class="todo-section">
-        <h5>Due Today <span id="count-due-today" class="count">
+    <section class="todo-section" id="due-today">
+        <h5>Due Today <span id="due-today-count" class="count">
                 <%= dueToday.length %>
             </span></h5>
         <ul>
@@ -228,8 +229,8 @@
     </section>
 
     <!-- Due Later Section -->
-    <section class="todo-section">
-        <h5>Due Later <span id="count-due-later" class="count">
+    <section class="todo-section" id="due-later">
+        <h5>Due Later <span id="due-later-count" class="count">
                 <%= dueLater.length %>
             </span></h5>
         <ul>
@@ -248,8 +249,8 @@
     </section>
 
     <!-- Completed Section -->
-    <section class="todo-section">
-        <h5>Completed Items <span id="count-completed" class="count">
+    <section class="todo-section" id="completed">
+        <h5>Completed <span id="completed-count" class="count">
                 <%= completed.length %>
             </span></h5>
         <ul>
@@ -271,6 +272,38 @@
     </footer>
 
     <script>
+        // In your script section
+        document.addEventListener('DOMContentLoaded', () => {
+            // Toggle completion
+            document.querySelectorAll('[data-toggle-complete]').forEach(checkbox => {
+                checkbox.addEventListener('change', async (e) => {
+                    const id = e.target.dataset.id;
+                    await fetch(`/todos/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'CSRF-Token': document.querySelector('[name="_csrf"]').value
+                        }
+                    });
+                    window.location.reload();
+                });
+            });
+
+            // Delete items
+            document.querySelectorAll('[data-delete]').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    if (confirm('Are you sure?')) {
+                        const id = e.target.dataset.id;
+                        await fetch(`/todos/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'CSRF-Token': document.querySelector('[name="_csrf"]').value
+                            }
+                        });
+                        window.location.reload();
+                    }
+                });
+            });
+        });
         // Update the fetch calls to include CSRF token consistently
         function updateTodoStatus(id, completed) {
             fetch(`/todos/${id}`, {

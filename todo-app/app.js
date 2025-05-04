@@ -97,7 +97,7 @@ router.get('/todos/:id/edit', csrfProtection, async (req, res) => { // Add csrfP
     try {
         const todo = await Todo.findByPk(req.params.id);
         if (!todo) return res.status(404).send('Todo not found');
-
+        todo.dueDate = new Date(todo.dueDate);
         res.render('edit', {
             todo,
             csrfToken: req.csrfToken() // Explicitly pass

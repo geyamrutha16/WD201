@@ -1,6 +1,6 @@
 <form action="/todos/<%= todo.id %>?_method=PUT" method="POST">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <input type="text" name="title" value="<%= todo.title %>" required>
-    <input type="date" name="dueDate" value="<%= todo.dueDate.toISOString().split('T')[0] %>">
-    <button type="submit">Update</button>
+    <input type="date" name="dueDate" value="<%= new Date(todo.dueDate).toISOString().split('T')[0] %>"> <button
+        type="submit">Update</button>
 </form>

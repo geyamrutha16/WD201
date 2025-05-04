@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { sequelize } = require('./models');
+const { sequelize.Todo } = require('./models');
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 
@@ -42,6 +42,24 @@ app.use((err, req, res, next) => {
     res.status(500).send('Internal Server Error');
 });
 
+async function initializeSampleData() {
+    const count = await Todo.count();
+    if (count === 0) {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        await Todo.bulkCreate([
+            { title: 'Overdue Task', dueDate: yesterday, completed: true },
+            { title: 'Today Task', dueDate: today, completed: false },
+            { title: 'Later Task', dueDate: tomorrow, completed: false }
+        ]);
+        console.log('Sample data created');
+    }
+}
+
 // Database and server initialization
 async function startServer() {
     try {
@@ -52,6 +70,8 @@ async function startServer() {
         // Sync models
         await sequelize.sync();
         console.log('Database synchronized');
+
+        initializeSampleData();
 
         // Start server
         const PORT = process.env.PORT || 10000;
@@ -65,24 +85,5 @@ async function startServer() {
     }
 }
 
-async function initializeSampleData() {
-    const count = await Todo.count();
-    if (count === 0) {
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-
-        await Todo.bulkCreate([
-            { title: 'Overdue Task', dueDate: yesterday, completed: false },
-            { title: 'Today Task', dueDate: today, completed: false },
-            { title: 'Later Task', dueDate: tomorrow, completed: false }
-        ]);
-        console.log('Sample data created');
-    }
-}
-
 // Start the application
 startServer();
-initializeSampleData();

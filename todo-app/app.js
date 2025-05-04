@@ -94,8 +94,10 @@ router.get('/todos/:id/edit', async (req, res) => {
         if (!todo) {
             return res.status(404).send('Todo not found');
         }
-        todo.dueDate = new Date(todo.dueDate);
-        res.render('edit', { todo }); // Make sure edit.ejs exists
+        res.render('edit', {
+            todo,
+            csrfToken: req.csrfToken() // Add this line
+        });
     } catch (error) {
         res.status(500).send('Server error');
     }

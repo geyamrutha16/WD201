@@ -7,16 +7,16 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const methodOverride = require('method-override');
 
+// Correct order in index.js
+app.use(cookieParser());
+app.use(csrfProtection);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(methodOverride('_method'));
 // Setup CSRF protection
-app.use(cookieParser());
 const csrfProtection = csrf({ cookie: true });
-
-
 // Middleware setup
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(csrfProtection);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // View engine configuration

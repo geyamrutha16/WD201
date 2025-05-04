@@ -276,7 +276,7 @@
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'CSRF-Token': '<%= csrfToken %>' // Use EJS template
+                    'CSRF-Token': document.querySelector('input[name="_csrf"]').value
                 },
                 body: JSON.stringify({ completed })
             })
@@ -295,7 +295,7 @@
                 fetch(`/todos/${id}`, {
                     method: 'DELETE',
                     headers: {
-                        'CSRF-Token': '<%= csrfToken %>' // Use EJS template
+                        'CSRF-Token': document.querySelector('input[name="_csrf"]').value
                     }
                 })
                     .then(response => {

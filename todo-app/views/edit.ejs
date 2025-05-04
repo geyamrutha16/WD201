@@ -1,4 +1,3 @@
-<!-- Add CSRF protection and proper method override -->
 <form action="/todos/<%= todo.id %>" method="POST">
     <input type="hidden" name="_method" value="PUT">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">

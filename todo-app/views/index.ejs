@@ -276,7 +276,7 @@
     </footer>
 
     <script>
-        /*
+
         async function toggleTodoStatus(id, checkbox) {
             try {
                 const response = await fetch(`/todos/${id}`, {
@@ -375,25 +375,6 @@
                         console.error('Error:', error);
                         alert('Failed to delete task');
                     });
-            }
-        }
-        */
-        async function toggleTodo(id) {
-            await fetch(`/todos/${id}`, {
-                method: 'PUT',
-                headers: { 'CSRF-Token': '<%= csrfToken %>' }
-            });
-            location.reload();
-        }
-
-        // Delete function
-        async function deleteTodo(id) {
-            if (confirm('Delete this task?')) {
-                await fetch(`/todos/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'CSRF-Token': '<%= csrfToken %>' }
-                });
-                location.reload();
             }
         }
 

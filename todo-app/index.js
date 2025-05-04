@@ -43,21 +43,18 @@ app.use((err, req, res, next) => {
 });
 
 async function initializeSampleData() {
-    const count = await Todo.count();
-    if (count === 0) {
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
 
-        await Todo.bulkCreate([
-            { title: 'Overdue Task', dueDate: yesterday, completed: true },
-            { title: 'Today Task', dueDate: today, completed: false },
-            { title: 'Later Task', dueDate: tomorrow, completed: false }
-        ]);
-        console.log('Sample data created');
-    }
+    await Todo.bulkCreate([
+        { title: 'Overdue Task', dueDate: yesterday, completed: true },
+        { title: 'Today Task', dueDate: today, completed: false },
+        { title: 'Later Task', dueDate: tomorrow, completed: false }
+    ]);
+    console.log('Sample data created');
 }
 
 // Database and server initialization

@@ -40,6 +40,26 @@ router.use((req, res, next) => {
     next();
 });
 
+router.post('/todos', csrfProtection, async (req, res) => {
+    try {
+        if (!req.body.title || !req.body.dueDate) {
+            return res.status(400).json({ error: 'Title and due date are required' });
+        }
+
+        await Todo.create({
+            title: req.body.title,
+            dueDate: req.body.dueDate,
+            completed: false
+        });
+
+        // Redirect to home page after creation
+        res.redirect('/');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error creating todo');
+    }
+});
+
 router.post('/todos/:id', csrfProtection, async (req, res) => {
     try {
         const todo = await Todo.findByPk(req.params.id);

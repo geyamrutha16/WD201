@@ -40,21 +40,22 @@ router.use((req, res, next) => {
     next();
 });
 
-router.post('/todos', csrfProtection, async (req, res) => {
+router.post('/todos/:id', csrfProtection, async (req, res) => {
     try {
-        if (!req.body.title || !req.body.dueDate) {
-            return res.status(400).json({ error: 'Title and due date are required' });
+        const todo = await Todo.findByPk(req.params.id);
+        if (!todo) {
+            return res.status(404).json({ error: 'Todo not found' });
         }
 
-        await Todo.create({
+        await todo.update({
             title: req.body.title,
-            dueDate: req.body.dueDate,
-            completed: false
+            dueDate: req.body.dueDate
         });
+
         res.redirect('/');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error creating todo');
+        res.status(500).json({ error: 'Server error' });
     }
 });
 

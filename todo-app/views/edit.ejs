@@ -1,5 +1,8 @@
-<form action="/todos/<%= todo.id %>?_method=PUT" method="POST">
-    <input type="text" name="title" value="<%= todo.title %>" required />
-    <input type="date" name="dueDate" value="<%= todo.dueDate.toString().slice(0, 10) %>" />
+<!-- Add CSRF protection and proper method override -->
+<form action="/todos/<%= todo.id %>" method="POST">
+    <input type="hidden" name="_method" value="PUT">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="text" name="title" value="<%= todo.title %>" required>
+    <input type="date" name="dueDate" value="<%= todo.dueDate.toISOString().split('T')[0] %>">
     <button type="submit">Update</button>
 </form>

@@ -56,26 +56,34 @@ router.post('/todos', csrfProtection, async (req, res) => {
 router.put('/todos/:id', csrfProtection, async (req, res) => {
     try {
         const todo = await Todo.findByPk(req.params.id);
-        if (!todo) return res.status(404).send('Todo not found');
+        if (!todo) {
+            return res.status(404).json({ error: 'Todo not found' });
+        }
 
-        await todo.setCompletionStatus(req.body.completed);
-        res.status(200).send();
+        await todo.update({
+            completed: req.body.completed,
+            // Add other fields if needed
+        });
+
+        res.json(todo);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error updating todo');
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
 router.delete('/todos/:id', csrfProtection, async (req, res) => {
     try {
-        const deleted = await Todo.destroy({
-            where: { id: req.params.id }
-        });
-        if (deleted) return res.status(204).send();
-        res.status(404).send('Todo not found');
+        const todo = await Todo.findByPk(req.params.id);
+        if (!todo) {
+            return res.status(404).json({ error: 'Todo not found' });
+        }
+
+        await todo.destroy();
+        res.status(204).end();
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error deleting todo');
+        res.status(500).json({ error: 'Server error' });
     }
 });
 

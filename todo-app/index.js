@@ -5,7 +5,9 @@ const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 
 const app = express();
+const methodOverride = require('method-override');
 
+app.use(methodOverride('_method'));
 // Setup CSRF protection
 app.use(cookieParser());
 const csrfProtection = csrf({ cookie: true });

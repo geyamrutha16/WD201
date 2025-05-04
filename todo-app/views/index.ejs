@@ -270,25 +270,24 @@
     </footer>
 
     <script>
+        // Update the fetch calls to include CSRF token consistently
         function updateTodoStatus(id, completed) {
             fetch(`/todos/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'CSRF-Token': document.querySelector('input[name="_csrf"]').value
+                    'CSRF-Token': '<%= csrfToken %>' // Use EJS template
                 },
                 body: JSON.stringify({ completed })
             })
                 .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    }
+                    if (!response.ok) throw new Error('Update failed');
+                    window.location.reload();
                 })
-                .catch(error => console.error('Error:', error));
-        }
-
-        function editTodo(id) {
-            window.location.href = `/todos/${id}/edit`;
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update task');
+                });
         }
 
         function deleteTodo(id) {
@@ -296,21 +295,22 @@
                 fetch(`/todos/${id}`, {
                     method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'CSRF-Token': '<%= csrfToken %>' // Use EJS template
                     }
                 })
                     .then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert('Failed to delete task');
-                        }
+                        if (!response.ok) throw new Error('Delete failed');
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Error deleting task');
+                        alert('Failed to delete task');
                     });
             }
+        }
+
+        function editTodo(id) {
+            window.location.href = `/todos/${id}/edit`;
         }
     </script>
 </body>

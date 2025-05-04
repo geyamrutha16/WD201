@@ -93,12 +93,9 @@ router.put('/todos/:id', csrfProtection, async (req, res) => {
             return res.status(404).json({ error: 'Todo not found' });
         }
 
-        // Explicitly convert to boolean in case it comes as string
-        const completed = req.body.completed === 'true' || req.body.completed === true;
-
-        await todo.update({ completed });
+        await todo.update({ completed: !todo.completed });
         console.log('Update successful'); // Debug log
-
+        res.redirect('/');
         res.json({ success: true });
     } catch (error) {
         console.error('Update error:', error); // Detailed error log
@@ -113,8 +110,7 @@ router.delete('/todos/:id', csrfProtection, async (req, res) => {
             return res.status(404).json({ error: 'Todo not found' });
         }
 
-        await todo.destroy();
-        res.status(204).end();
+        await Todo.destroy({ where: { id: req.params.id } }); res.status(204).end();
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });

@@ -149,13 +149,13 @@
 </head>
 
 <body>
-    <h1>This is my Todo Application</h1>
+    <h1>Todo Application</h1>
 
     <form action="/todos" method="POST">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <input type="text" name="title" id="title" placeholder="Enter task" required>
+        <input type="text" name="title" id="title" placeholder="Task title" required>
         <input type="date" name="dueDate" id="dueDate" required>
-        <button type="submit" id="submit-btn">Add Todo</button>
+        <button type="submit" id="submit-btn">Add Task</button>
     </form>
 
     <table>
@@ -180,9 +180,9 @@
                         <%= todo.completed ? 'Completed' : 'Pending' %>
                     </td>
                     <td>
-                        <input type="checkbox" onchange="toggleTodoStatus('<%= todo.id %>', this)" <%=todo.completed
+                        <input type="checkbox" onchange="toggleTodoStatus('<%= todo.id %>')" <%=todo.completed
                             ? 'checked' : '' %>>
-                        <button data-delete data-id="<%= todo.id %>">Delete</button>
+                        <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
                     </td>
                 </tr>
                 <% }); %>
@@ -191,9 +191,10 @@
 
     <!-- Overdue Section -->
     <section class="todo-section" id="overdue">
-        <h5>Overdue <span id="overdue-count" class="count">
+        <h5>Overdue <div id="overdue-count" class="count">
                 <%= overdue.length %>
-            </span></h5>
+            </div>
+        </h5>
         <ul>
             <% overdue.forEach(todo=> { %>
                 <li class="todo-item">
@@ -211,9 +212,10 @@
 
     <!-- Due Today Section -->
     <section class="todo-section" id="due-today">
-        <h5>Due Today <span id="due-today-count" class="count">
+        <h5>Due Today <div id="due-today-count" class="count">
                 <%= dueToday.length %>
-            </span></h5>
+            </div>
+        </h5>
         <ul>
             <% dueToday.forEach(todo=> { %>
                 <li class="todo-item">
@@ -230,9 +232,10 @@
 
     <!-- Due Later Section -->
     <section class="todo-section" id="due-later">
-        <h5>Due Later <span id="due-later-count" class="count">
+        <h5>Due Later <div id="due-later-count" class="count">
                 <%= dueLater.length %>
-            </span></h5>
+            </div>
+        </h5>
         <ul>
             <% dueLater.forEach(todo=> { %>
                 <li class="todo-item">
@@ -250,9 +253,10 @@
 
     <!-- Completed Section -->
     <section class="todo-section" id="completed">
-        <h5>Completed <span id="completed-count" class="count">
+        <h5>Completed <div id="completed-count" class="count">
                 <%= completed.length %>
-            </span></h5>
+            </div>
+        </h5>
         <ul>
             <% completed.forEach(todo=> { %>
                 <li class="todo-item">
@@ -272,6 +276,7 @@
     </footer>
 
     <script>
+        /*
         async function toggleTodoStatus(id, checkbox) {
             try {
                 const response = await fetch(`/todos/${id}`, {
@@ -370,6 +375,25 @@
                         console.error('Error:', error);
                         alert('Failed to delete task');
                     });
+            }
+        }
+        */
+        async function toggleTodo(id) {
+            await fetch(`/todos/${id}`, {
+                method: 'PUT',
+                headers: { 'CSRF-Token': '<%= csrfToken %>' }
+            });
+            location.reload();
+        }
+
+        // Delete function
+        async function deleteTodo(id) {
+            if (confirm('Delete this task?')) {
+                await fetch(`/todos/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'CSRF-Token': '<%= csrfToken %>' }
+                });
+                location.reload();
             }
         }
 

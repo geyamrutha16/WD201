@@ -5,6 +5,7 @@ const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 
 const app = express();
+const csrfProtection = csrf({ cookie: true });
 const methodOverride = require('method-override');
 
 // Correct order in index.js
@@ -15,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(methodOverride('_method'));
 // Setup CSRF protection
-const csrfProtection = csrf({ cookie: true });
+
 // Middleware setup
 app.use(express.static(path.join(__dirname, 'public')));
 

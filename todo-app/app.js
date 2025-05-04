@@ -35,6 +35,11 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken(); // Make available to all views
+    next();
+});
+
 router.post('/todos', csrfProtection, async (req, res) => {
     try {
         if (!req.body.title || !req.body.dueDate) {
@@ -87,16 +92,14 @@ router.delete('/todos/:id', csrfProtection, async (req, res) => {
     }
 });
 
-router.get('/todos/:id/edit', async (req, res) => {
-    const id = req.params.id;
+router.get('/todos/:id/edit', csrfProtection, async (req, res) => { // Add csrfProtection
     try {
-        const todo = await Todo.findByPk(id);
-        if (!todo) {
-            return res.status(404).send('Todo not found');
-        }
+        const todo = await Todo.findByPk(req.params.id);
+        if (!todo) return res.status(404).send('Todo not found');
+
         res.render('edit', {
             todo,
-            csrfToken: req.csrfToken() // Add this line
+            csrfToken: req.csrfToken() // Explicitly pass
         });
     } catch (error) {
         res.status(500).send('Server error');

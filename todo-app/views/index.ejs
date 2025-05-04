@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta name="csrf-token" content="<%= csrfToken %>">
     <title>Todo App</title>
     <style>
         body {
@@ -276,7 +277,7 @@
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'CSRF-Token': document.querySelector('input[name="_csrf"]').value
+                    'CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
                 },
                 body: JSON.stringify({ completed })
             })

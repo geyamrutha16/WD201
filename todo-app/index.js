@@ -5,16 +5,24 @@ const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 
 const app = express();
-const csrfProtection = csrf({ cookie: true });
+//const csrfProtection = csrf({ cookie: true });
+// Configure CSRF more securely
+const csrfProtection = csrf({
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 3600 // 1 hour
+    }
+});
 const methodOverride = require('method-override');
 
 // Correct order in index.js
 app.use(cookieParser());
-app.use(csrfProtection);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(methodOverride('_method'));
+app.use(csrfProtection);
 // Setup CSRF protection
 
 // Middleware setup

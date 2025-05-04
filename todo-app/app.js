@@ -85,17 +85,24 @@ router.post('/todos/:id', csrfProtection, async (req, res) => {
 
 router.put('/todos/:id', csrfProtection, async (req, res) => {
     try {
+        console.log('Updating todo:', req.params.id, 'with data:', req.body); // Debug log
+
         const todo = await Todo.findByPk(req.params.id);
         if (!todo) {
+            console.log('Todo not found'); // Debug log
             return res.status(404).json({ error: 'Todo not found' });
         }
 
-        await todo.update({ completed: !todo.completed });
+        // Explicitly convert to boolean in case it comes as string
+        const completed = req.body.completed === 'true' || req.body.completed === true;
 
-        res.redirect('/');
+        await todo.update({ completed });
+        console.log('Update successful'); // Debug log
+
+        res.json({ success: true });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Update error:', error); // Detailed error log
+        res.status(500).json({ error: 'Failed to update todo' });
     }
 });
 

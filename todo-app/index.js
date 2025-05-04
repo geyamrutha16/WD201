@@ -85,3 +85,4 @@ async function initializeSampleData() {
 
 // Start the application
 startServer();
+initializeSampleData();

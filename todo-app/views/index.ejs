@@ -180,8 +180,8 @@
                         <%= todo.completed ? 'Completed' : 'Pending' %>
                     </td>
                     <td>
-                        <input type="checkbox" onchange="toggleTodoStatus('<%= todo.id %>', this.checked)"
-                            <%=todo.completed ? 'checked' : '' %>>
+                        <input type="checkbox" onchange="toggleTodoStatus('<%= todo.id %>', this)" <%=todo.completed
+                            ? 'checked' : '' %>>
                         <button data-delete data-id="<%= todo.id %>">Delete</button>
                     </td>
                 </tr>
@@ -272,8 +272,7 @@
     </footer>
 
     <script>
-        // In your script section
-        async function toggleTodoStatus(id, isChecked) {
+        async function toggleTodoStatus(id, checkbox) {
             try {
                 const response = await fetch(`/todos/${id}`, {
                     method: 'PUT',
@@ -281,17 +280,26 @@
                         'Content-Type': 'application/json',
                         'CSRF-Token': document.querySelector('[name="_csrf"]').value
                     },
-                    body: JSON.stringify({ completed: !isChecked }) // Toggle the status
+                    body: JSON.stringify({
+                        completed: checkbox.checked
+                    })
                 });
 
-                if (response.ok) {
-                    window.location.reload(); // Refresh to show updated status
-                } else {
-                    alert('Failed to update status');
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to update status');
                 }
+
+                // Update UI without reload if you prefer
+                const statusCell = checkbox.closest('tr').querySelector('.status');
+                statusCell.textContent = checkbox.checked ? 'Completed' : 'Pending';
+                statusCell.className = checkbox.checked ? 'completed' : 'pending';
+
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error updating task status');
+                checkbox.checked = !checkbox.checked; // Revert checkbox on error
+                alert(error.message);
             }
         }
 

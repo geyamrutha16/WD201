@@ -67,11 +67,13 @@ router.put('/todos/:id', csrfProtection, async (req, res) => {
         }
 
         await todo.update({
-            completed: req.body.completed,
-            // Add other fields if needed
+            title: req.body.title,
+            dueDate: req.body.dueDate,
+            completed: req.body.completed || false
         });
 
-        res.json(todo);
+        // Redirect to home page after successful update
+        res.redirect('/');
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });

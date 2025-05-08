@@ -83,22 +83,22 @@ router.post('/todos/:id', csrfProtection, async (req, res) => {
     }
 });
 
+// Update PUT endpoint to accept completed status
 router.put('/todos/:id', csrfProtection, async (req, res) => {
     try {
-        console.log('Updating todo:', req.params.id, 'with data:', req.body); // Debug log
-
         const todo = await Todo.findByPk(req.params.id);
         if (!todo) {
-            console.log('Todo not found'); // Debug log
             return res.status(404).json({ error: 'Todo not found' });
         }
 
-        await todo.update({ completed: !todo.completed });
-        console.log('Update successful'); // Debug log
-        res.redirect('/');
+        // Use the completed status from request body
+        await todo.update({
+            completed: req.body.completed
+        });
+
         res.json({ success: true });
     } catch (error) {
-        console.error('Update error:', error); // Detailed error log
+        console.error('Update error:', error);
         res.status(500).json({ error: 'Failed to update todo' });
     }
 });
@@ -110,7 +110,8 @@ router.delete('/todos/:id', csrfProtection, async (req, res) => {
             return res.status(404).json({ error: 'Todo not found' });
         }
 
-        await Todo.destroy({ where: { id: req.params.id } }); res.status(204).end();
+        await Todo.destroy({ where: { id: req.params.id } });
+        res.status(204).end();
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });

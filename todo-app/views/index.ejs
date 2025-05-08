@@ -151,7 +151,7 @@
 <body>
     <h1>Todo Application</h1>
 
-    <form action="/todos" method="POST">
+    <form action="/todos" method="POST" onsubmit="return validateForm()">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="text" name="title" id="title" placeholder="Task title" required>
         <input type="date" name="dueDate" id="dueDate" required>
@@ -191,7 +191,7 @@
 
     <!-- Overdue Section -->
     <section class="todo-section" id="overdue">
-        <h5>Overdue <div id="overdue-count" class="count">
+        <h5>Overdue <div id="count-overdue" class="count">
                 <%= overdue.length %>
             </div>
         </h5>
@@ -212,7 +212,7 @@
 
     <!-- Due Today Section -->
     <section class="todo-section" id="due-today">
-        <h5>Due Today <div id="due-today-count" class="count">
+        <h5>Due Today <div id="count-due-today" class="count">
                 <%= dueToday.length %>
             </div>
         </h5>
@@ -232,7 +232,7 @@
 
     <!-- Due Later Section -->
     <section class="todo-section" id="due-later">
-        <h5>Due Later <div id="due-later-count" class="count">
+        <h5>Due Later <div id="count-due-later" class="count">
                 <%= dueLater.length %>
             </div>
         </h5>
@@ -253,7 +253,7 @@
 
     <!-- Completed Section -->
     <section class="todo-section" id="completed">
-        <h5>Completed <div id="completed-count" class="count">
+        <h5>Completed <div id="count-completed" class="count">
                 <%= completed.length %>
             </div>
         </h5>
@@ -276,6 +276,21 @@
     </footer>
 
     <script>
+
+        function validateForm() {
+            const title = document.getElementById('title').value.trim();
+            const dueDate = document.getElementById('dueDate').value;
+
+            if (!title) {
+                alert('Title cannot be empty');
+                return false;
+            }
+            if (!dueDate) {
+                alert('Due date cannot be empty');
+                return false;
+            }
+            return true;
+        }
 
         async function toggleTodoStatus(id, checkbox) {
             try {

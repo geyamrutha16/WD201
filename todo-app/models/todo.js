@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         dueDate: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: false,
             validate: {
                 notEmpty: true
@@ -18,12 +18,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             defaultValue: false
         }
-    }, {
-        instanceMethods: {
-            setCompletionStatus: function (status) {
-                return this.update({ completed: status });
-            }
-        }
     });
+
+    Todo.prototype.setCompletionStatus = function (status) {
+        return this.update({ completed: status });
+    };
+
     return Todo;
 };

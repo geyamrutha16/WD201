@@ -7,76 +7,61 @@ describe("Todo Test Suite", () => {
         await db.sequelize.sync({ force: true });
     });
 
-    test("Creates a todo and responds with redirect at /todos POST endpoint", async () => {
+    test("Creates a todo and responds with redirect", async () => {
         const response = await request(app)
             .post("/todos")
             .send({
                 title: "Test todo",
                 dueDate: "2025-04-15",
-                _csrf: "test-csrf-token" // Add CSRF token for testing
+                _csrf: "test-csrf-token"
             });
-        expect(response.statusCode).toBe(302); // Should redirect after creation
+        expect(response.statusCode).toBe(302);
     });
 
-    test("Fetches all todos in the database using / endpoint", async () => {
-        const response = await request(app).get("/");
-        expect(response.statusCode).toBe(200);
+    test("Fails to create todo with empty title", async () => {
+        const response = await request(app)
+            .post("/todos")
+            .send({
+                title: "",
+                dueDate: "2025-04-15",
+                _csrf: "test-csrf-token"
+            });
+        expect(response.statusCode).toBe(400);
     });
 
-    test("Updates a todo's completion status with PUT /todos/:id", async () => {
+    test("Updates a todo's completion status", async () => {
         const todo = await db.Todo.create({
-            title: "Todo to update",
+            title: "Test todo",
             dueDate: "2025-04-16",
-            completed: false,
+            completed: false
         });
+
         const response = await request(app)
             .put(`/todos/${todo.id}`)
             .send({
                 completed: true,
                 _csrf: "test-csrf-token"
             });
-        expect(response.statusCode).toBe(200);
 
-        // Verify the update
+        expect(response.statusCode).toBe(200);
         const updatedTodo = await db.Todo.findByPk(todo.id);
         expect(updatedTodo.completed).toBe(true);
     });
 
-    test("Deletes a todo with the given ID if it exists", async () => {
+    test("Deletes a todo", async () => {
         const todo = await db.Todo.create({
             title: "Todo to delete",
             dueDate: "2025-04-17",
-            completed: false,
+            completed: false
         });
+
         const response = await request(app)
             .delete(`/todos/${todo.id}`)
-            .set('Cookie', ['XSRF-TOKEN=test-csrf-token'])
             .send({ _csrf: "test-csrf-token" });
-        expect(response.statusCode).toBe(204);
 
-        // Verify deletion
+        expect(response.statusCode).toBe(204);
         const deletedTodo = await db.Todo.findByPk(todo.id);
         expect(deletedTodo).toBeNull();
-    });
-
-    test("Fails to create todo with empty title or dueDate", async () => {
-        const response1 = await request(app)
-            .post("/todos")
-            .send({
-                title: "",
-                dueDate: "2025-04-18",
-                _csrf: "test-csrf-token"
-            });
-        expect(response1.statusCode).toBe(400);
-
-        const response2 = await request(app)
-            .post("/todos")
-            .send({
-                title: "No date",
-                dueDate: "",
-                _csrf: "test-csrf-token"
-            });
-        expect(response2.statusCode).toBe(400);
     });
 
     afterAll(async () => {

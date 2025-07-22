@@ -5,9 +5,41 @@ body {
   padding: 20px;
 }
 
-header h1 {
-  color: #333;
-  text-align: center;
+.todo-sections section {
+  margin-bottom: 30px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.Todo-Item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.Todo-Item label {
+  margin-left: 10px;
+  flex-grow: 1;
+}
+
+.due-date {
+  color: #666;
+  margin-left: 10px;
+}
+
+button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #cc0000;
 }
 
 form {
@@ -19,35 +51,14 @@ form {
 input[type="text"],
 input[type="date"] {
   padding: 8px;
-  flex-grow: 1;
+  border: 1px solid #ddd;
+  border-radius: 3px;
 }
 
-button {
-  padding: 8px 16px;
+button[type="submit"] {
   background-color: #4caf50;
-  color: white;
-  border: none;
-  cursor: pointer;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-tr:hover {
-  background-color: #f5f5f5;
-}
-
-footer h1 {
-  text-align: center;
-  color: #666;
-  margin-top: 40px;
+button[type="submit"]:hover {
+  background-color: #45a049;
 }

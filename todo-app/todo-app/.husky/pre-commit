@@ -2,4 +2,5 @@
 . "$(dirname "$0")/_/husky.sh"
 
 echo "Running pre-commit hooks..."
-npm test --prefix todo-cli
+npx prettier --write .
+npm test

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <title>Todo App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .todo-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .todo-sections section {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-sections h5 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+
+        #overdue-count,
+        #due-today-count,
+        #due-later-count {
+            display: inline-block;
+            margin-left: 10px;
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .edit-btn {
+            background-color: #f39c12;
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .completed {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .pending {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Todo Application</h1>
+
+    <form action="/todos" method="POST" onsubmit="return validateForm()">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="text" name="title" id="title" placeholder="Task title" required>
+        <input type="date" name="dueDate" id="dueDate" required>
+        <button type="submit" id="submit-btn">Add Task</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% todos.forEach(todo=> { %>
+                <tr>
+                    <td>
+                        <%= todo.title %>
+                    </td>
+                    <td>
+                        <%= todo.dueDate %>
+                    </td>
+                    <td class="<%= todo.completed ? 'completed' : 'pending' %>">
+                        <%= todo.completed ? 'Completed' : 'Pending' %>
+                    </td>
+                    <td>
+                        <input type="checkbox" onchange="toggleTodoStatus('<%= todo.id %>')" <%=todo.completed
+                            ? 'checked' : '' %>>
+                        <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                    </td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+
+    <!-- Overdue Section -->
+    <section class="todo-section" id="overdue">
+        <h5>Overdue <div id="count-overdue" class="count">
+                <%= overdue.length %>
+            </div>
+        </h5>
+        <ul>
+            <% overdue.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed
+                        ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span>(Due: <%= todo.dueDate %>)</span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+
+    <!-- Due Today Section -->
+    <section class="todo-section" id="due-today">
+        <h5>Due Today <div id="count-due-today" class="count">
+                <%= dueToday.length %>
+            </div>
+        </h5>
+        <ul>
+            <% dueToday.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed
+                        ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+
+    <!-- Due Later Section -->
+    <section class="todo-section" id="due-later">
+        <h5>Due Later <div id="count-due-later" class="count">
+                <%= dueLater.length %>
+            </div>
+        </h5>
+        <ul>
+            <% dueLater.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" <%=todo.completed
+                        ? 'checked' : '' %>>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span>(Due: <%= todo.dueDate %>)</span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+
+    <!-- Completed Section -->
+    <section class="todo-section" id="completed">
+        <h5>Completed <div id="count-completed" class="count">
+                <%= completed.length %>
+            </div>
+        </h5>
+        <ul>
+            <% completed.forEach(todo=> { %>
+                <li class="todo-item">
+                    <input type="checkbox" onchange="updateTodoStatus('<%= todo.id %>', this.checked)" checked>
+                    <span>
+                        <%= todo.title %>
+                    </span>
+                    <span>(Due: <%= todo.dueDate %>)</span>
+                    <button onclick="deleteTodo('<%= todo.id %>')">Delete</button>
+                </li>
+                <% }); %>
+        </ul>
+    </section>
+
+    <footer>
+        <h1>Built with Node.js</h1>
+    </footer>
+
+    <script>
+
+        function validateForm() {
+            const title = document.getElementById('title').value.trim();
+            const dueDate = document.getElementById('dueDate').value;
+
+            if (!title) {
+                alert('Title cannot be empty');
+                return false;
+            }
+            if (!dueDate) {
+                alert('Due date cannot be empty');
+                return false;
+            }
+            return true;
+        }
+
+        async function toggleTodoStatus(id, checkbox) {
+            try {
+                const response = await fetch(`/todos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'CSRF-Token': document.querySelector('[name="_csrf"]').value
+                    },
+                    body: JSON.stringify({
+                        completed: checkbox.checked
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to update status');
+                }
+
+                // Update UI without reload if you prefer
+                const statusCell = checkbox.closest('tr').querySelector('.status');
+                statusCell.textContent = checkbox.checked ? 'Completed' : 'Pending';
+                statusCell.className = checkbox.checked ? 'completed' : 'pending';
+
+            } catch (error) {
+                console.error('Error:', error);
+                checkbox.checked = !checkbox.checked; // Revert checkbox on error
+                alert(error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Toggle completion
+            document.querySelectorAll('[data-toggle-complete]').forEach(checkbox => {
+                checkbox.addEventListener('change', async (e) => {
+                    const id = e.target.dataset.id;
+                    await fetch(`/todos/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'CSRF-Token': document.querySelector('[name="_csrf"]').value
+                        }
+                    });
+                    window.location.reload();
+                });
+            });
+
+            // Delete items
+            document.querySelectorAll('[data-delete]').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    if (confirm('Are you sure?')) {
+                        const id = e.target.dataset.id;
+                        await fetch(`/todos/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'CSRF-Token': document.querySelector('[name="_csrf"]').value
+                            }
+                        });
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+        // Update the fetch calls to include CSRF token consistently
+        function updateTodoStatus(id, completed) {
+            fetch(`/todos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ completed })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Update failed');
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update task');
+                });
+        }
+
+        function deleteTodo(id) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                fetch(`/todos/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'CSRF-Token': document.querySelector('input[name="_csrf"]').value
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Delete failed');
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to delete task');
+                    });
+            }
+        }
+
+        function editTodo(id) {
+            window.location.href = `/todos/${id}/edit`;
+        }
+    </script>
+</body>
+
+</html>

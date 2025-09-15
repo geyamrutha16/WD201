@@ -1,0 +1,13 @@
+{
+  "folders": [
+	{
+		"path": "../../L8"
+	},
+	{
+		"path": ".."
+	}
+],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "News_App"
+  }
+}

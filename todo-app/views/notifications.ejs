@@ -1,0 +1,19 @@
+<% if (messages.error && messages.error.length > 0) { %>
+  <div class="flash error">
+    <ul>
+      <% messages.error.forEach(function(msg) { %>
+        <li><%= msg %></li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>
+
+<% if (messages.success && messages.success.length > 0) { %>
+  <div class="flash success">
+    <ul>
+      <% messages.success.forEach(function(msg) { %>
+        <li><%= msg %></li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>

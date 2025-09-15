@@ -1,0 +1,99 @@
+<!-- Overdue Section -->
+<section>
+  <h5>Overdue (<span id="count-overdue"><%= overdue.length %></span>)</h5>
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Due Date</th><th>Complete</th><th>Delete</th></tr>
+    </thead>
+    <tbody>
+      <% overdue.forEach(todo => { %>
+        <tr class="Todo-Item">
+          <td><label for="todo-<%= todo.id %>"><%= todo.title %></label></td>
+          <td><%= todo.dueDate %></td>
+          <td>
+            <input type="checkbox" id="todo-<%= todo.id %>" data-id="<%= todo.id %>"
+              onchange="toggleCompletionStatus(<%= todo.id %>, this.checked)" />
+          </td>
+          <td>
+            <button onclick="deleteTodo(<%= todo.id %>)">🗑</button>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</section>
+
+<!-- Due Today Section -->
+<section>
+  <h5>Due Today (<span id="count-due-today"><%= dueToday.length %></span>)</h5>
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Due Date</th><th>Complete</th><th>Delete</th></tr>
+    </thead>
+    <tbody>
+      <% dueToday.forEach(todo => { %>
+        <tr class="Todo-Item">
+          <td><label for="todo-<%= todo.id %>"><%= todo.title %></label></td>
+          <td><%= todo.dueDate %></td>
+          <td>
+            <input type="checkbox" id="todo-<%= todo.id %>" data-id="<%= todo.id %>"
+              onchange="toggleCompletionStatus(<%= todo.id %>, this.checked)" />
+          </td>
+          <td>
+            <button onclick="deleteTodo(<%= todo.id %>)">🗑</button>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</section>
+
+<!-- Due Later Section -->
+<section>
+  <h5>Due Later (<span id="count-due-later"><%= dueLater.length %></span>)</h5>
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Due Date</th><th>Complete</th><th>Delete</th></tr>
+    </thead>
+    <tbody>
+      <% dueLater.forEach(todo => { %>
+        <tr class="Todo-Item">
+          <td><label for="todo-<%= todo.id %>"><%= todo.title %></label></td>
+          <td><%= todo.dueDate %></td>
+          <td>
+            <input type="checkbox" id="todo-<%= todo.id %>" data-id="<%= todo.id %>"
+              onchange="toggleCompletionStatus(<%= todo.id %>, this.checked)" />
+          </td>
+          <td>
+            <button onclick="deleteTodo(<%= todo.id %>)">🗑</button>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</section>
+
+<!-- Completed Items Section -->
+<section>
+  <h5>Completed Items (<span id="count-completed"><%= completed.length %></span>)</h5>
+  <table>
+    <thead>
+      <tr><th>Task</th><th>Due Date</th><th>Complete</th><th>Delete</th></tr>
+    </thead>
+    <tbody>
+      <% completed.forEach(todo => { %>
+        <tr class="Todo-Item">
+          <td><label for="todo-<%= todo.id %>"><%= todo.title %></label></td>
+          <td><%= todo.dueDate %></td>
+          <td>
+            <input type="checkbox" id="todo-<%= todo.id %>" data-id="<%= todo.id %>"
+              checked onchange="toggleCompletionStatus(<%= todo.id %>, this.checked)" />
+          </td>
+          <td>
+            <button onclick="deleteTodo(<%= todo.id %>)">🗑</button>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</section>
